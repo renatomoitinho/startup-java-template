@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property scope="context" name="project.version" value="@project.version@"/>
+
+    <appender name="json" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp>
+                    <fieldName>ts</fieldName>
+                    <timeZone>America/Sao_Paulo</timeZone>
+                </timestamp>
+                <pattern>
+                    <pattern>
+                        {
+                        "level"  :  "%level",
+                        "version":  "${project.version}",
+                        "host"   :  "${HOSTNAME}",
+                        "thread" :  "%thread",
+                        "logger" :  "%logger{24}",
+                        "msg"    :  "%message"
+                        }
+                    </pattern>
+                </pattern>
+                <stackTrace>
+                    <fieldName>stack</fieldName>
+                    <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                        <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                        <maxLength>512</maxLength>
+                        <shortenedClassNameLength>20</shortenedClassNameLength>
+                        <exclude>^sun\.reflect\..*\.invoke</exclude>
+                        <exclude>^net\.sf\.cglib\.proxy\.MethodProxy\.invoke</exclude>
+                        <rootCauseFirst>true</rootCauseFirst>
+                    </throwableConverter>
+                </stackTrace>
+            </providers>
+        </encoder>
+    </appender>
+
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="com.zaxxer.hikari" level="WARN"/>
+    <logger name="org.hibernate" level="WARN"/>
+
+    <root level="INFO">
+        <appender-ref ref="json"/>
+    </root>
+
+</configuration>

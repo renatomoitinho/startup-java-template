@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: Demo App Integration pipeline
+  main:
+    banner-mode: off
+  datasource:
+    url: jdbc:h2:file:/tmp/demo;DB_CLOSE_ON_EXIT=FALSE;IFEXISTS=TRUE
+    driver-class-name: org.h2.Driver
+    username: demo
+    password: demo
+    hikari:
+      maximum-pool-size: 10
+      connection-test-query: select sysdate
+  flyway:
+    enabled: false
+
+server:
+  address: 0.0.0.0
+  port: 8080
+  servlet:
+    context-path: /
+  error:
+    whitelabel:
+      enabled: false
+
+project:
+  info:
+    groupId: @project.groupId@
+    artifactId: @project.artifactId@
+    name: @project.name@
+    version: @project.version@
+    description: @project.description@
+    documentation: /swagger-ui.html
+
+management:
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: ['metrics','prometheus', 'health']
+  endpoint:
+    prometheus:
+      enabled: true
+    metrics:
+      enabled: true
+    health:
+      show-details: always
