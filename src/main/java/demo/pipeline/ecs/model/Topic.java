@@ -1,15 +1,17 @@
 package demo.pipeline.ecs.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Schema
+@ToString
 @Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity @Table(name = "topics")
 public class Topic {
 
@@ -23,3 +25,7 @@ public class Topic {
     @Size(min = 5, max = 255, message = "{topic.Size}")
     private String message;
 }
+
+
+
+

@@ -2,50 +2,63 @@ package demo.pipeline.ecs.service;
 
 import demo.pipeline.ecs.model.Topic;
 import demo.pipeline.ecs.repository.TopicRepository;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.support.TransactionTemplate;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
+
+import java.util.Optional;
 
 @Service
 public class TopicService {
 
+    private final Logger LOGGER = LoggerFactory.getLogger(TopicService.class);
+
     private final TopicRepository repository;
-    private final TransactionTemplate transactionTemplate;
-    private final Scheduler scheduler;
 
-    public TopicService(TopicRepository repository, TransactionTemplate transactionTemplate,
-                        @Qualifier("jdbcSchedule") Scheduler scheduler) {
+    public TopicService(TopicRepository repository) {
         this.repository = repository;
-        this.transactionTemplate = transactionTemplate;
-        this.scheduler = scheduler;
     }
 
-    public Flux<Topic> find() {
-        return Flux.defer(() -> Flux.fromIterable(repository.findAll())).subscribeOn(scheduler);
+    public Page<Topic> find(final Pageable pageable) {
+        LOGGER.info("find topics call page={} size={}", pageable.getPageNumber(), pageable.getPageSize());
+        return repository.findAll(pageable);
     }
 
-    public Mono<Topic> getById(Long id) {
-        return Mono.justOrEmpty(repository.findById(id));
+    public Optional<Topic> getById(Long id) {
+        LOGGER.info("getById topic call id={}", id);
+        Optional<Topic> opt = repository.findById(id);
+        if (opt.isEmpty()) {
+            LOGGER.warn("getById not found topic id={}", id);
+        }
+        return opt;
     }
 
-    public Mono<Topic> save(final Topic topic) {
-        return Mono.fromCallable(() -> transactionTemplate.execute(_a -> repository.save(topic)));
+    public Topic save(final Topic topic) {
+        var topicSaved = repository.save(topic);
+        LOGGER.info("save topic was successfully inserted {}", topicSaved);
+        return topicSaved;
     }
 
-    public Mono<Topic> update(Long id, Topic topic) {
-        return getById(id).flatMap(t -> {
-            t.setMessage(topic.getMessage());
-            return save(t);
-        }).defaultIfEmpty(new Topic());
+    public void update(Long id, Topic topic) {
+        getById(id).map(tp -> update(tp, topic)).ifPresent(tp -> {
+            LOGGER.info("update topic was updated successfully {}", tp);
+        });
     }
 
-    public Mono<?> delete(final Long id) {
-        return Mono.fromCallable(() -> transactionTemplate.execute(_a -> {
+    public void delete(final Long id) {
+        try {
             repository.deleteById(id);
-            return true;
-        })).subscribeOn(scheduler);
+            LOGGER.info("delete topic was successfully removed {}", id);
+        } catch (EmptyResultDataAccessException e) {
+            LOGGER.warn("delete Topic not exists to id={} message={}", id, e.getMessage());
+        }
+    }
+
+    private Topic update(Topic source, Topic target) {
+        source.setMessage(target.getMessage());
+        return repository.save(source);
     }
 }

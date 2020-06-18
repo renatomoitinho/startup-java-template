@@ -4,12 +4,12 @@ import demo.pipeline.ecs.model.Topic;
 import demo.pipeline.ecs.service.TopicService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import java.util.Map;
 
 @RestController
 @RequestMapping("topics")
@@ -27,13 +27,19 @@ public class TopicController {
     @GetMapping
     @ResponseBody
     @Operation(summary = "get topics")
-    public Flux<Topic> find() {
-        return topicService.find();
+    public Map<?, ?> find(@RequestParam("page") int page, @RequestParam("size") int size) {
+        var result = topicService.find(PageRequest.of(page, size));
+        return Map.of(
+                "content", result.getContent(),
+                "pageNumber", result.getNumber(),
+                "pageSize", result.getSize(),
+                "totalPages", result.getTotalPages());
     }
 
     @PostMapping
+    @ResponseBody
     @Operation(summary = "create new topic")
-    public Mono<Topic> create(@RequestBody @Valid Topic topic) {
+    public Topic create(@RequestBody @Valid Topic topic) {
         topic.setId(null);
         return topicService.save(topic);
     }
@@ -41,19 +47,21 @@ public class TopicController {
     @ResponseBody
     @GetMapping(PATH_KEY_ID)
     @Operation(summary = "get single topic")
-    public Mono<Topic> get(@PathVariable("id") Long id) {
-        return topicService.getById(id);
+    public Topic get(@PathVariable("id") Long id) {
+        return topicService.getById(id).orElse(new Topic());
     }
 
     @PutMapping(PATH_KEY_ID)
     @Operation(summary = "update single topic")
-    public Mono<ResponseEntity<Void>> update(@PathVariable("id") Long id, @RequestBody @Valid Topic topic) {
-        return topicService.update(id, topic).map((r) -> ResponseEntity.noContent().build());
+    public ResponseEntity<Void> update(@PathVariable("id") Long id, @RequestBody @Valid Topic topic) {
+        topicService.update(id, topic);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping(PATH_KEY_ID)
     @Operation(summary = "delete single topic")
-    public Mono<ResponseEntity<Void>> delete(@PathVariable("id") Long id) {
-        return topicService.delete(id).map((r) -> ResponseEntity.noContent().build());
+    public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+        topicService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

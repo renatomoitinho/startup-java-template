@@ -36,6 +36,6 @@ public class ApplicationTestContext {
 
     @Bean
     public TopicService topicService() {
-        return new TopicService(topicRepository(), transactionTemplate(), scheduler());
+        return new TopicService(topicRepository());
     }
 }

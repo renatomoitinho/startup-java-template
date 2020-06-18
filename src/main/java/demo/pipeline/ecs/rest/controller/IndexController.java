@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
@@ -24,12 +23,12 @@ public class IndexController {
     @Autowired
     public IndexController(final ProjectProperties properties) {
         this.properties = properties;
-        this.info = new LinkedHashMap<String, String>() {{
-            put("Name", properties.getName());
-            put("Version", properties.getVersion());
-            put("Description", properties.getDescription());
-            put("Swagger", properties.getDocumentation());
-        }};
+        this.info = Map.of(
+                "Name", properties.getName(),
+                "Version", properties.getVersion(),
+                "Description", properties.getDescription(),
+                "Swagger", properties.getDocumentation()
+        );
     }
 
     @GetMapping

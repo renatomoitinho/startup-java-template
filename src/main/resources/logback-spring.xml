@@ -16,7 +16,7 @@
                         "version":  "${project.version}",
                         "host"   :  "${HOSTNAME}",
                         "thread" :  "%thread",
-                        "logger" :  "%logger{24}",
+                        "logger" :  "%logger{42}",
                         "msg"    :  "%message"
                         }
                     </pattern>
@@ -39,6 +39,8 @@
     <logger name="org.springframework" level="WARN"/>
     <logger name="com.zaxxer.hikari" level="WARN"/>
     <logger name="org.hibernate" level="WARN"/>
+    <logger name="org.eclipse.jetty" level="WARN"/>
+    <logger name="org.springframework.boot.actuate.metrics.export" level="OFF"/>
 
     <root level="INFO">
         <appender-ref ref="json"/>

@@ -10,10 +10,10 @@
 	</parent>
 
 	<groupId>demo.pipeline.ecs</groupId>
-	<artifactId>demo.pipeline</artifactId>
+	<artifactId>startup.demo</artifactId>
 	<version>1.0.0</version>
 	<name>Demo Web-Flux Api Pipeline</name>
-	<description>Demo Web-Flux Pipeline To GitLab AWS ECS</description>
+	<description>Demo Web-Flux Pipeline in GitLab AWS ECS</description>
 	<developers>
 		<developer>
             <name>Dev Name</name>
@@ -22,10 +22,10 @@
 	</developers>
 
 	<properties>
-		<flyway.db.url>jdbc:h2:file:/tmp/demo;DB_CLOSE_ON_EXIT=FALSE;IFEXISTS=TRUE</flyway.db.url>
-		<flyway.db.user>demo</flyway.db.user>
-		<flyway.db.password>demo</flyway.db.password>
-		<java.version>1.8</java.version>
+		<flyway.db.url>none</flyway.db.url>
+		<flyway.db.user>none</flyway.db.user>
+		<flyway.db.password>none</flyway.db.password>
+		<java.version>13</java.version>
 	</properties>
 
 	<dependencies>
@@ -35,7 +35,17 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webflux</artifactId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jetty</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.flywaydb</groupId>
@@ -56,6 +66,16 @@
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.prometheus</groupId>
+			<artifactId>simpleclient_pushgateway</artifactId>
+			<version>0.8.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.mweirauch</groupId>
+			<artifactId>micrometer-jvm-extras</artifactId>
+			<version>0.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -83,7 +103,7 @@
 		<!-- api docs -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-webflux-ui</artifactId>
+			<artifactId>springdoc-openapi-ui</artifactId>
 			<version>1.2.32</version>
 		</dependency>
 		<!-- api docs end -->
@@ -111,21 +131,21 @@
 		<dependency>
 			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-junit</artifactId>
-			<version>5.5.0</version>
+			<version>5.7.0</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>io.cucumber</groupId>
-			<artifactId>cucumber-java8</artifactId>
-			<version>5.5.0</version>
+			<artifactId>cucumber-java</artifactId>
+			<version>5.7.0</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-spring</artifactId>
-			<version>5.5.0</version>
+			<version>5.7.0</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- end tests -->
@@ -136,7 +156,7 @@
 		<profile>
 			<id>development</id>
 			<properties>
-				<flyway.db.url>jdbc:h2:file:/tmp/demo</flyway.db.url>
+				<flyway.db.url>jdbc:h2:file:./startupdb</flyway.db.url>
 				<flyway.db.user>demo</flyway.db.user>
 				<flyway.db.password>demo</flyway.db.password>
 			</properties>
@@ -156,6 +176,9 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<outputDirectory>build</outputDirectory>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.flywaydb</groupId>

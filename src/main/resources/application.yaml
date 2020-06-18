@@ -1,28 +1,3 @@
-spring:
-  application:
-    name: Demo App Integration pipeline
-  main:
-    banner-mode: off
-  datasource:
-    url: jdbc:h2:file:/tmp/demo;DB_CLOSE_ON_EXIT=FALSE;IFEXISTS=TRUE
-    driver-class-name: org.h2.Driver
-    username: demo
-    password: demo
-    hikari:
-      maximum-pool-size: 10
-      connection-test-query: select sysdate
-  flyway:
-    enabled: false
-
-server:
-  address: 0.0.0.0
-  port: 8080
-  servlet:
-    context-path: /
-  error:
-    whitelabel:
-      enabled: false
-
 project:
   info:
     groupId: @project.groupId@
@@ -32,16 +7,55 @@ project:
     description: @project.description@
     documentation: /swagger-ui.html
 
+spring:
+  application:
+    name: Demo App Integration pipeline
+
+  main:
+    banner-mode: off
+  datasource:
+    url: jdbc:h2:file:./startupdb;DB_CLOSE_ON_EXIT=FALSE;IFEXISTS=TRUE
+    driver-class-name: org.h2.Driver
+    username: demo
+    password: demo
+    hikari:
+      maximum-pool-size: 40
+      connection-test-query: select sysdate
+      pool-name: Pipe-line-demo-hikari-pool
+      minimum-idle: 5
+  jpa:
+    open-in-view: false
+  flyway:
+    enabled: false
+
+server:
+  address: 0.0.0.0
+  port: 8090
+  servlet:
+    context-path: /
+  error:
+    whitelabel:
+      enabled: false
+  jetty:
+    max-threads: 240
+    min-threads: 10
+
 management:
   metrics:
     export:
       prometheus:
         enabled: true
+        pushgateway:
+          enabled: true
+          push-rate: 30s
+          base-url: http://127.0.0.1:9091
+
   endpoints:
     web:
       base-path: /
       exposure:
-        include: ['metrics','prometheus', 'health']
+        include: ['prometheus', 'health']
+
   endpoint:
     prometheus:
       enabled: true

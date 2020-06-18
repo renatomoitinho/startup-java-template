@@ -6,10 +6,12 @@ Java
 - Logs para Logstash json format (https://github.com/logstash/logstash-logback-encoder)
 - Swagger usando spring apidocs (https://springdoc.org/)
 - Lombok (https://projectlombok.org/)
-- Spring validator 
+- Spring validator (internacionalização)
 - Metricas (https://docs.spring.io/spring-metrics/docs/current/public/prometheus)
 - Health check (valida as dependencias)
 - Testes unitatios Cucumber/junit/mockito
+  (Testes integration/ automatizados)
+  (Testes Front-end)
 - Flyway Migration
 - Docker
 
